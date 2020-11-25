@@ -1,8 +1,10 @@
 package com.example.gameloop;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -12,6 +14,8 @@ import androidx.core.content.ContextCompat;
 
 public class Game extends SurfaceView implements SurfaceHolder.Callback {
     private GameLoop gameLoop;
+
+    Bitmap bitmap;
 
     public Game(Context context) {
         super(context);
@@ -43,6 +47,7 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
+        drawPicture(canvas);
         drawUPS(canvas);
         drawFPS(canvas);
     }
@@ -65,7 +70,17 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         canvas.drawText("FPS: " + averageFPS, 100, 40, paint);
     }
 
+    public void drawPicture ( Canvas canvas ) {
+        Rect rect = new Rect(0,0,1280, 720);
+        canvas.drawBitmap( bitmap, null, rect, null);
+    }
+
     public void update() {
         // update game state
+    }
+
+    public void createPicture() {
+        bitmap = Bitmap.createBitmap(1280, 720, Bitmap.Config.ARGB_8888);
+        bitmap.eraseColor( ContextCompat.getColor(getContext(), R.color.dark_red));
     }
 }

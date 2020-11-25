@@ -48,6 +48,9 @@ public class GameLoop extends Thread {
 
         // main game loop
         Canvas canvas = null;
+        canvas = surfaceHolder.lockCanvas();
+        game.createPicture();
+        surfaceHolder.unlockCanvasAndPost(canvas);
         startTime = System.currentTimeMillis();
         while ( isRunning ) {
 
