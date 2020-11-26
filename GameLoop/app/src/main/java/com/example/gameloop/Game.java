@@ -3,6 +3,7 @@ package com.example.gameloop;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.view.SurfaceHolder;
@@ -12,10 +13,10 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
+import java.util.Random;
+
 public class Game extends SurfaceView implements SurfaceHolder.Callback {
     private GameLoop gameLoop;
-
-    Bitmap bitmap;
 
     public Game(Context context) {
         super(context);
@@ -47,7 +48,7 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        drawPicture(canvas);
+        drawMap(canvas);
         drawUPS(canvas);
         drawFPS(canvas);
     }
@@ -68,19 +69,90 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         paint.setColor(color);
         paint.setTextSize(20);
         canvas.drawText("FPS: " + averageFPS, 100, 40, paint);
+        canvas.drawText("W: " + nScreenWidth + " H " + nScreenHeight, 100, 60, paint);
+        canvas.drawText("cw: " + nCellWidth + " ch " + nCellHeight, 100, 80, paint);
     }
 
-    public void drawPicture ( Canvas canvas ) {
-        Rect rect = new Rect(0,0,1280, 720);
-        canvas.drawBitmap( bitmap, null, rect, null);
+    public void drawMap ( Canvas canvas ) {
+        Paint paint = new Paint();
+        Rect rect = new Rect();
+        for ( int x=0; x<nMapWidth; x++ ) {
+            for ( int y=0; y<nMapHeight; y++ ) {
+
+                int i = y*nCellHeight, j = x*nCellWidth;
+                rect.top = i ; rect.left = j ;
+                rect.bottom = i+nCellHeight ; rect.right = j+nCellWidth ;
+
+                switch ( nMapArr[y*nMapWidth+x] ) {
+                    case 9 :
+                        paint.setColor(color_green);
+                        canvas.drawRect(rect, paint);
+                        break;
+                    case 3 :
+                        paint.setColor(color_cyan);
+                        canvas.drawRect(rect, paint);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        // drawing bat
+        rect.top = nScreenHeight-nCellWidth; rect.left = (int)fBatPos-nBatLength;
+        rect.bottom = rect.top+(nCellHeight/2);rect.right = (int)fBatPos+nBatLength;
+        paint.setColor(color_red);
+        canvas.drawRect(rect, paint);
     }
 
     public void update() {
-        // update game state
+                //int color = ((A&0xff)<<24 | (R&0xff)<<16 | (G&0xff)<<8 | (B&0xff));
+                //drawPixel(i,j,color);
     }
 
-    public void createPicture() {
-        bitmap = Bitmap.createBitmap(1280, 720, Bitmap.Config.ARGB_8888);
-        bitmap.eraseColor( ContextCompat.getColor(getContext(), R.color.dark_red));
+    int color_red = ContextCompat.getColor(getContext(), R.color.red);
+    int color_black = ContextCompat.getColor(getContext(), R.color.black);
+    int color_white = ContextCompat.getColor(getContext(), R.color.white);
+    int color_green = ContextCompat.getColor(getContext(), R.color.green);
+    int color_blue = ContextCompat.getColor(getContext(), R.color.blue);
+    int color_cyan = ContextCompat.getColor(getContext(), R.color.cyan);
+
+    int nScreenWidth;
+    int nScreenHeight;
+    int nMapWidth;
+    int nMapHeight;
+    int nCellWidth;
+    int nCellHeight;
+    int[] nMapArr;
+    float fBatPos;
+    int nBatLength;
+
+    public void createPicture(Canvas canvas) {
+        nScreenWidth = canvas.getWidth();
+        nScreenHeight = canvas.getHeight();
+        nMapWidth = 15;
+        nMapHeight = 30;
+        nCellWidth = nScreenWidth/nMapWidth;
+        nCellHeight = nScreenHeight/nMapHeight;
+        prepareMap();
+        prepareBat();
+    }
+
+    private void prepareBat() {
+        fBatPos = (float)(nScreenWidth/2);
+        nBatLength = nCellWidth;
+    }
+
+    public void prepareMap () {
+        nMapArr = new int[nMapWidth*nMapHeight];
+        for ( int x=0; x<nMapWidth; x++ ) {
+            for (int y = 0; y < nMapHeight; y++) {
+                if (x==0||y==0||x==nMapWidth-1) nMapArr[y*nMapWidth+x] = 9;
+                else nMapArr[y*nMapWidth+x] = 0;
+            }
+        }
+        int limit = nMapWidth-4, start = 2*nMapWidth+2;
+        while ( limit-->0 ) {
+            nMapArr[start+limit] = 3;
+        }
     }
 }
