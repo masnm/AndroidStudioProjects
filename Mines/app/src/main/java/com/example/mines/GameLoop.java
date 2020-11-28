@@ -1,10 +1,7 @@
-package com.example.gameloop;
+package com.example.mines;
 
 import android.graphics.Canvas;
-import android.view.Surface;
 import android.view.SurfaceHolder;
-
-import java.util.Observer;
 
 public class GameLoop extends Thread {
 
@@ -50,9 +47,6 @@ public class GameLoop extends Thread {
 
         // main game loop
         Canvas canvas = null;
-        canvas = surfaceHolder.lockCanvas();
-        game.createPicture(canvas);
-        surfaceHolder.unlockCanvasAndPost(canvas);
         startTime = System.currentTimeMillis();
         while ( isRunning ) {
 
